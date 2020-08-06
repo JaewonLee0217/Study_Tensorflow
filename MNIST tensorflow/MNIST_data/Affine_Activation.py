@@ -42,8 +42,9 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis,
 
 ##그 다음은 gradient descent구하는 거
 learning_rate = 0.001
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 #optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(cost)
-optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,momentum=0.9).minimize(cost)
+#optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,momentum=0.9).minimize(cost)
 #loss값 최소화하도록 최적화한다는 것.
 #optimizer설정을 지금은 SGD사용했지만 Adagrad,RMSProp,Momentum,Adam
 
@@ -65,11 +66,17 @@ for epoch in range(training_epochs):
     correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels})
+
     print('Test Accuracy:', test_accuracy)
+
+    if test_accuracy > max:
+        max = test_accuracy
+        early_stopped_time = epoch +1
 
     avg_cost =0
     total_batch = int(mnist.train.num_examples / batch_size) # 55000개를 100으로 나누니까 550개의 batch
 
+#training
     for i in range(total_batch): #이제 각각의 mini_batch에 대해서
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         #그러면 알아서 mnist.train의 데이터 중에서 batchsize만큼 뽑아서 준다.
@@ -84,18 +91,19 @@ for epoch in range(training_epochs):
     print('몇번 째 Epoch이냐:','%04d'%(epoch+1),'cost= ','{:.9f}'.format(avg_cost))
 
 
-    #test
-    correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
-    #argmax란 hypothesis, 즉 확률 중에 가장 큰 것이 몇번 째에 있냐를 불러오는 것.
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-    test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels})
-
-    #print('Test Accuracy:', test_accuracy)
+#test
+correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
+#argmax란 hypothesis, 즉 확률 중에 가장 큰 것이 몇번 째에 있냐를 불러오는 것.
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels})
 
     #가장 좋은 성능을 보인 모델을 뽑아내는 코드
-    if test_accuracy > max:
+if test_accuracy > max:
         max = test_accuracy
-        early_stopped_time = epoch+1
+        early_stopped_time = epoch +1
+
+print('Test Accuracy:', test_accuracy)
+
 print("Learning Finished!")
 print("Best Accuracy: ",max)
 print("Early stopped time:",early_stopped_time)
