@@ -1,6 +1,6 @@
 #X라는 input이 모델에 들어오면, W,b에서 곱하기, 더하기 연산이 일어나고  softymax를 거쳐서 확률
 #을 출력하게 되는데, 이 사이 과정을 Affine과 예를 들어서 Relu activation함수가 담당을 한다.
-
+import matplotlib.pyplot as plt
 import tensorflow as tf
 ####데이터 준비하는 part
 from tensorflow.examples.tutorials.mnist import input_data
@@ -92,10 +92,11 @@ for epoch in range(training_epochs):
 
 
 #test
-correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.argmax(Y, 1))
+prediction = tf.argmax(hypothesis, 1)
+correct_prediction = tf.equal(prediction, tf.argmax(Y, 1))
 #argmax란 hypothesis, 즉 확률 중에 가장 큰 것이 몇번 째에 있냐를 불러오는 것.
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-test_accuracy = sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels})
+test_accuracy, answer = sess.run([accuracy, prediction], feed_dict={X: mnist.test.images, Y: mnist.test.labels})
 
     #가장 좋은 성능을 보인 모델을 뽑아내는 코드
 if test_accuracy > max:
@@ -107,8 +108,15 @@ print('Test Accuracy:', test_accuracy)
 print("Learning Finished!")
 print("Best Accuracy: ",max)
 print("Early stopped time:",early_stopped_time)
+for i in range(10):
+    plt.imshow(
+        mnist.test.images[i].reshape(28, 28),
+        cmap="Greys",
+        interpolation="nearest",
+    )
+    plt.show()
 
-
-
+print(answer[:10])
+#test샘플에서 앞에 있는 결과 10개
 
 
