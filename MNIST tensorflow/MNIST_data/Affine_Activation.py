@@ -42,7 +42,9 @@ cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis,
 
 ##그 다음은 gradient descent구하는 거
 learning_rate = 0.001
-optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+optimizer = tf.train.RMSPropOptimizer(learning_rate=learning_rate, momentum=0.9).minimize(cost)
+
+#optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 #optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate).minimize(cost)
 #optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,momentum=0.9).minimize(cost)
 #loss값 최소화하도록 최적화한다는 것.
@@ -71,7 +73,7 @@ for epoch in range(training_epochs):
 
     if test_accuracy > max:
         max = test_accuracy
-        early_stopped_time = epoch +1
+        early_stopped_time = epoch
 
     avg_cost =0
     total_batch = int(mnist.train.num_examples / batch_size) # 55000개를 100으로 나누니까 550개의 batch
@@ -101,7 +103,7 @@ test_accuracy, answer = sess.run([accuracy, prediction], feed_dict={X: mnist.tes
     #가장 좋은 성능을 보인 모델을 뽑아내는 코드
 if test_accuracy > max:
         max = test_accuracy
-        early_stopped_time = epoch +1
+        early_stopped_time = epoch
 
 print('Test Accuracy:', test_accuracy)
 
