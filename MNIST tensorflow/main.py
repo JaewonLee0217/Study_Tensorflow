@@ -29,6 +29,7 @@ plt.imshow(
 )
 plt.show()
 
+#각각의 filter가 뽑아내는 다른 output이라고 생각하면 된다.
 
 
 
