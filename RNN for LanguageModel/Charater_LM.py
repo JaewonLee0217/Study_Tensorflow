@@ -49,8 +49,39 @@ multi_cells = rnn.MultiRNNCell([lstm_cell() for _ in range(2)],state_is_tuple=Tr
 outputs, _states = tf.nn.dynamic_rnn(multi_cells,X_one_hot,dtype=tf.float32)
 
 #fully connected layer FC
-X_for_fc = tf.reshape(outputs,[-1,hidden_size])
+X_for_fc = tf.reshape(outputs,[-1,hidden_size]) # -1은 보고 자동으로 설정해라는 의미.
 outputs = tf.contrib.layers.fully_connected(X_for_fc,num_classes,activation_fn=None)
 # softmax_w = tf.get_variable("softmax_w",[hidden_size, num_classes])
 # softmax_b = tf.get_variable("softmax_b",[num_classes])
-# outputs = tf.matmul(X_for_fc, softmax_w) + softmax_b
+# outputs = tf.matmul(X_for_fc, softmax_w) + softmax_b ##이 과정이 fc함수에 들어있다.
+
+outputs = tf.reshape(outputs, [batch_size, sequence_length, num_classes]) # batch 사이즈를 원래대로 복구를 시켜준다.
+
+#웨이트는 로스들을 잘 합칠 때 가중치를 줘가주고 더하겠다
+weights = tf.ones([batch_size, sequence_length])
+
+sequence_loss = tf.contrib.seq2seq.sequence_loss(
+logits= outputs, targets=Y, weights=weights)
+mean_loss = tf.reduce_mean(sequence_loss)
+train_op = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(mean_loss)
+
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
+
+for i in range(500): #500번을 돌려서 학습을 시킨다음에
+    _, l, results = sess.run(
+        [train_op, mean_loss, outputs], feed_dict={X: dataX, Y: dataY})
+    for j, result in enumerate(results):
+        index = np.argmax(result, axis=1)
+        print(i, j, ''.join([char_set[t] for t in index]), l)
+
+
+# 마지막 글자 결과 값을 예측을 통해 출력해 보면,
+results = sess.run(outputs,feed_dict={X:dataX})
+for j, result in enumerate(results):
+    index = np.argmax(result, axis=1)
+    if j is 0: # print all for the first result to make a sentence
+        print(''.join([char_set[t] for t in index]), end='')
+    else:
+        print(char_set[index[-1]], end='')
+
