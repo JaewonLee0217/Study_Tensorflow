@@ -11,3 +11,6 @@ MNIST & CIFAR-10 & yolov3 & android app
 -RNN for language model 
 
 
+-text language for CNN and RNN
+
+
