@@ -8,7 +8,7 @@ MNIST & CIFAR-10 & yolov3 & android app
 
 -CNN for word2vec, text classfication
 
--RNN for language model 
+-RNN for language model LSTM
 
 
 -text language for CNN and RNN
