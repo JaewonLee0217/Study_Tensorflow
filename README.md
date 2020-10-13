@@ -13,4 +13,5 @@ MNIST & CIFAR-10 & yolov3 & android app
 
 -text language for CNN and RNN
 
+-LSTM 기반 번역기 학습 
 
