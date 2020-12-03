@@ -15,4 +15,4 @@ MNIST & CIFAR-10 & yolov3 & android app
 
 -LSTM 기반 번역기 학습 
 
--Coursera(Convolustional)
+-Coursera(Sequence model)
